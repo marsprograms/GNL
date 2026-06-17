@@ -6,7 +6,7 @@
 /*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/28 22:12:27 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/17 14:44:14 by mariade-         ###   ########.fr       */
+/*   Updated: 2026/06/17 19:31:54 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,10 +60,44 @@ char	*gnl_strjoin(char *s1, char *s2)
 
 char	*extract_line(char *line)
 {
-	
+	char	*str;
+	ssize_t	i;
+	ssize_t	end;
+
+	if (!line)
+		return (free(line), NULL);
+	end = 0;
+	while (line[end] && line[end] != '\n')
+		end++;
+	if (line[end] == '\n')
+		end++;
+	if (line[end] == 0)
+		return(free(line), NULL);
+	str = malloc (end + 1);
+	if (!str)
+		return (NULL);
+	i = 0;
+	while (i < end)
+	{
+		str[i] = line[i];
+		i++;
+	}
+	str[i] = '\0';
+	return (str);
 }
 
-char	*update_stash(char *line, ssize_t start, ssize_t end)
+char	*update_stash(char *line, ssize_t start, ssize_t len)
 {
+	char	*new_stash;
+	ssize_t	i;
+	
+	if (!line)
+		return (free(line), NULL);
+	start = 0;
+	while (line[start] && line[start] != '\n')
+		start++;
+	if (line[start] == '\n')
+		start++;
+	len = gnl_strlen(line + 1);
 	
 }

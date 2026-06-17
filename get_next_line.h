@@ -6,7 +6,7 @@
 /*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/28 22:12:19 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/17 14:38:14 by mariade-         ###   ########.fr       */
+/*   Updated: 2026/06/17 17:29:54 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,5 +22,10 @@
 
 
 char	*get_next_line(int fd);
+ssize_t	gnl_strlen(char *line);
+char	*find_new_line(char *line, int c);
+char	*gnl_strjoin(char *s1, char *s2);
+char	*extract_line(char *line);
+char	*update_stash(char *line, ssize_t start, ssize_t end);
 
 #endif
