@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/05 19:09:02 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/05 19:09:02 by mariade-         ###   ########.fr       */
+/*   Created: 2026/05/28 22:12:16 by mariade-          #+#    #+#             */
+/*   Updated: 2026/06/17 15:40:17 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,15 @@
 
 char	*get_next_line(int fd)
 {
-	static char		*leftover = NULL;
-	char			buffer[BUFFER_SIZE + 1];
-	char			*line;
-	ssize_t			bytes_read;
+	static char	*leftover = NULL;
+	char		*line;
+	char		buffer[BUFFER_SIZE + 1];
+	ssize_t		bytes_read;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, buffer[0], 0) < 0)
+	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	bytes_read = 1;
-	while (!gnl_strchr(leftover, '\n') && bytes_read > 0)
+	while (!find_new_line(leftover, '\n') && bytes_read > 0)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read <= 0)
@@ -35,6 +35,6 @@ char	*get_next_line(int fd)
 	if (bytes_read == -1 || !leftover || *leftover == '\0')
 		return (free(leftover), leftover = NULL, NULL);
 	line = extract_line(leftover);
-	leftover = update_buffer(leftover, 0, 0);
+	leftover = 
 	return (line);
 }
