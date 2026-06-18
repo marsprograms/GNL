@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/28 22:12:16 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/17 17:28:32 by mariade-         ###   ########.fr       */
+/*   Created: 2026/06/05 19:09:02 by mariade-          #+#    #+#             */
+/*   Updated: 2026/06/05 19:09:02 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,27 +14,43 @@
 
 char	*get_next_line(int fd)
 {
-	static char	*stash = NULL;
-	char		*line;
-	char		buffer[BUFFER_SIZE + 1];
-	ssize_t		bytes_read;
+	static char		*leftover = NULL;
+	char			buffer[BUFFER_SIZE + 1];
+	char			*line;
+	ssize_t			bytes_read;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, buffer[0], 0) < 0)
 		return (NULL);
 	bytes_read = 1;
-	while (!find_new_line(stash, '\n') && bytes_read > 0)
+	while (!gnl_strchr(leftover, '\n') && bytes_read > 0)
 	{
 		bytes_read = read(fd, buffer, BUFFER_SIZE);
 		if (bytes_read <= 0)
 			break ;
 		buffer[bytes_read] = '\0';
-		stash = gnl_strjoin(stash, buffer);
-		if (!stash)
+		leftover = gnl_strjoin(leftover, buffer);
+		if (!leftover)
 			return (NULL);
 	}
-	if (bytes_read == -1 || !stash || *stash == '\0')
-		return (free(stash), stash = NULL, NULL);
-	line = extract_line(stash);
-	stash = update_stash(stash, 0, 0);
+	if (bytes_read == -1 || !leftover || *leftover == '\0')
+		return (free(leftover), leftover = NULL, NULL);
+	line = extract_line(leftover);
+	leftover = update_stash(leftover, 0, 0);
 	return (line);
 }
+/* #include <fcntl.h>
+#include <stdio.h>
+
+int main(void)
+{
+    int   fd = open("file.txt", O_RDONLY);
+    char *line;
+
+    while ((line = get_next_line(fd)) != NULL)
+    {
+        printf("%s", line);
+        free(line);
+    }
+    close(fd);
+    return (0);
+} */

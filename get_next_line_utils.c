@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/05/28 22:12:27 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/17 19:31:54 by mariade-         ###   ########.fr       */
+/*   Created: 2026/06/05 19:09:02 by mariade-          #+#    #+#             */
+/*   Updated: 2026/06/05 19:09:02 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,18 +43,22 @@ char	*gnl_strjoin(char *s1, char *s2)
 	ssize_t		i;
 	ssize_t		j;
 
-	if (!s1 || !s2)
+	if (!s2)
 		return (NULL);
-	str = malloc (gnl_strlen(s1) + gnl_strlen(s2) + 1 * sizeof(char));
+	if (!s1)
+		s1 = "";
+	str = malloc ((gnl_strlen(s1) + gnl_strlen(s2) + 1) * sizeof(char));
 	if (!str)
 		return (NULL);
 	i = 0;
+	j = 0;
 	while (s1[i])
 		str[j++] = s1[i++];
 	i = 0;
 	while (s2[i])
 		str[j++] = s2[i++];
 	str[j] = '\0';
+	free(s1);
 	return (str);
 }
 
@@ -71,8 +75,6 @@ char	*extract_line(char *line)
 		end++;
 	if (line[end] == '\n')
 		end++;
-	if (line[end] == 0)
-		return(free(line), NULL);
 	str = malloc (end + 1);
 	if (!str)
 		return (NULL);
@@ -93,11 +95,24 @@ char	*update_stash(char *line, ssize_t start, ssize_t len)
 	
 	if (!line)
 		return (free(line), NULL);
-	start = 0;
 	while (line[start] && line[start] != '\n')
 		start++;
-	if (line[start] == '\n')
-		start++;
-	len = gnl_strlen(line + 1);
-	
+	if (!line[start])
+		return (free(line), NULL);
+	start++;
+	len = gnl_strlen(line + start);
+	if (len == 0)
+		return (free(line), NULL);
+	new_stash = malloc(len + 1);
+	if (!new_stash)
+		return (NULL);
+	i = 0;
+	while (i < len)
+	{
+		new_stash[i] = line[start + i];
+		i++;
+	}
+	new_stash[i] = '\0';
+	free(line);
+	return (new_stash);
 }
