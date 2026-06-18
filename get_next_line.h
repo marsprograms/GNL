@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/05 19:09:02 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/05 19:09:02 by mariade-         ###   ########.fr       */
+/*   Created: 2026/05/28 22:12:19 by mariade-          #+#    #+#             */
+/*   Updated: 2026/06/18 17:16:16 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,6 @@ ssize_t	gnl_strlen(char *line);
 char	*find_new_line(char *line, int c);
 char	*gnl_strjoin(char *s1, char *s2);
 char	*extract_line(char *line);
-char	*update_stash(char *line, ssize_t start, ssize_t end);
+char	*update_stash(char *line, ssize_t start, ssize_t len);
 
 #endif

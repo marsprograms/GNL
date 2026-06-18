@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/06/05 19:09:02 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/05 19:09:02 by mariade-         ###   ########.fr       */
+/*   Created: 2026/05/28 22:12:27 by mariade-          #+#    #+#             */
+/*   Updated: 2026/06/18 17:15:13 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,10 +43,8 @@ char	*gnl_strjoin(char *s1, char *s2)
 	ssize_t		i;
 	ssize_t		j;
 
-	if (!s2)
+	if (!s1 || !s2)
 		return (NULL);
-	if (!s1)
-		s1 = "";
 	str = malloc ((gnl_strlen(s1) + gnl_strlen(s2) + 1) * sizeof(char));
 	if (!str)
 		return (NULL);
