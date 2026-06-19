@@ -22,10 +22,10 @@
 
 
 char	*get_next_line(int fd);
-ssize_t	gnl_strlen(char *line);
+size_t	gnl_strlen(char *line);
 char	*find_new_line(char *line, int c);
 char	*gnl_strjoin(char *s1, char *s2);
 char	*extract_line(char *line);
-char	*update_stash(char *line, ssize_t start, ssize_t len);
+char	*update_stash(char *line, size_t start, size_t len);
 
 #endif

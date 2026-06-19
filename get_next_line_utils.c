@@ -12,9 +12,9 @@
 
 #include "get_next_line.h"
 
-ssize_t	gnl_strlen(char *line)
+size_t	gnl_strlen(char *line)
 {
-	ssize_t	i;
+	size_t	i;
 
 	if (!line)
 		return (0);
@@ -40,31 +40,33 @@ char	*find_new_line(char *line, int c)
 char	*gnl_strjoin(char *s1, char *s2)
 {
 	char		*str;
-	ssize_t		i;
-	ssize_t		j;
+	size_t		i;
+	size_t		j;
 
-	if (!s1 || !s2)
+	if (!s2)
 		return (NULL);
 	str = malloc ((gnl_strlen(s1) + gnl_strlen(s2) + 1) * sizeof(char));
 	if (!str)
 		return (NULL);
 	i = 0;
 	j = 0;
-	while (s1[i])
-		str[j++] = s1[i++];
+	if (s1)
+		while (s1[i])
+			str[j++] = s1[i++];
 	i = 0;
 	while (s2[i])
 		str[j++] = s2[i++];
 	str[j] = '\0';
-	free(s1);
+	if (s1)
+		free(s1);
 	return (str);
 }
 
 char	*extract_line(char *line)
 {
 	char	*str;
-	ssize_t	i;
-	ssize_t	end;
+	size_t	i;
+	size_t	end;
 
 	if (!line)
 		return (free(line), NULL);
@@ -86,10 +88,10 @@ char	*extract_line(char *line)
 	return (str);
 }
 
-char	*update_stash(char *line, ssize_t start, ssize_t len)
+char	*update_stash(char *line, size_t start, size_t len)
 {
 	char	*new_stash;
-	ssize_t	i;
+	size_t	i;
 	
 	if (!line)
 		return (free(line), NULL);
