@@ -43,36 +43,21 @@ char	*gnl_strjoin(char *line, char *buffer)
 	size_t		i;
 	size_t		j;
 
-<<<<<<< HEAD
-	if (!s2)
-=======
 	if (!buffer)
->>>>>>> 9533029 (Pushing final version)
 		return (NULL);
 	str = malloc ((gnl_strlen(line) + gnl_strlen(buffer) + 1) * sizeof(char));
 	if (!str)
 		return (NULL);
 	i = 0;
 	j = 0;
-<<<<<<< HEAD
-	if (s1)
-		while (s1[i])
-			str[j++] = s1[i++];
-=======
 	if (line)
 		while (line[i])
 			str[j++] = line[i++];
->>>>>>> 9533029 (Pushing final version)
 	i = 0;
 	while (buffer[i])
 		str[j++] = buffer[i++];
 	str[j] = '\0';
-<<<<<<< HEAD
-	if (s1)
-		free(s1);
-=======
 	free(line);
->>>>>>> 9533029 (Pushing final version)
 	return (str);
 }
 
@@ -106,11 +91,7 @@ char	*update_stash(char *line, size_t start, size_t len)
 {
 	char	*new_stash;
 	size_t	i;
-<<<<<<< HEAD
-	
-=======
 
->>>>>>> 9533029 (Pushing final version)
 	if (!line)
 		return (free(line), NULL);
 	while (line[start] && line[start] != '\n')
