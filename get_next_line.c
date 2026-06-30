@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: mariade- <mariade-student.42lisboa.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/28 22:12:16 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/17 17:28:32 by mariade-         ###   ########.fr       */
+/*   Updated: 2026/06/30 04:35:21 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ char	*get_next_line(int fd)
 	ssize_t		bytes_read;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (NULL);
+		return (free(stash), stash = NULL, NULL);
 	bytes_read = 1;
 	while (!find_new_line(stash, '\n') && bytes_read > 0)
 	{

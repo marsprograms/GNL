@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: mariade- <mariade-student.42lisboa.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/28 22:12:27 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/18 17:15:13 by mariade-         ###   ########.fr       */
+/*   Updated: 2026/06/30 04:59:49 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ size_t	gnl_strlen(char *line)
 	if (!line)
 		return (0);
 	i = 0;
-	while(line[i])
+	while (line[i])
 		i++;
 	return (i);
 }
@@ -37,28 +37,42 @@ char	*find_new_line(char *line, int c)
 	return (NULL);
 }
 
-char	*gnl_strjoin(char *s1, char *s2)
+char	*gnl_strjoin(char *line, char *buffer)
 {
 	char		*str;
 	size_t		i;
 	size_t		j;
 
+<<<<<<< HEAD
 	if (!s2)
+=======
+	if (!buffer)
+>>>>>>> 9533029 (Pushing final version)
 		return (NULL);
-	str = malloc ((gnl_strlen(s1) + gnl_strlen(s2) + 1) * sizeof(char));
+	str = malloc ((gnl_strlen(line) + gnl_strlen(buffer) + 1) * sizeof(char));
 	if (!str)
 		return (NULL);
 	i = 0;
 	j = 0;
+<<<<<<< HEAD
 	if (s1)
 		while (s1[i])
 			str[j++] = s1[i++];
+=======
+	if (line)
+		while (line[i])
+			str[j++] = line[i++];
+>>>>>>> 9533029 (Pushing final version)
 	i = 0;
-	while (s2[i])
-		str[j++] = s2[i++];
+	while (buffer[i])
+		str[j++] = buffer[i++];
 	str[j] = '\0';
+<<<<<<< HEAD
 	if (s1)
 		free(s1);
+=======
+	free(line);
+>>>>>>> 9533029 (Pushing final version)
 	return (str);
 }
 
@@ -92,7 +106,11 @@ char	*update_stash(char *line, size_t start, size_t len)
 {
 	char	*new_stash;
 	size_t	i;
+<<<<<<< HEAD
 	
+=======
+
+>>>>>>> 9533029 (Pushing final version)
 	if (!line)
 		return (free(line), NULL);
 	while (line[start] && line[start] != '\n')
@@ -105,7 +123,7 @@ char	*update_stash(char *line, size_t start, size_t len)
 		return (free(line), NULL);
 	new_stash = malloc(len + 1);
 	if (!new_stash)
-		return (NULL);
+		return (free(line), NULL);
 	i = 0;
 	while (i < len)
 	{

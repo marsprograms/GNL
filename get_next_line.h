@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
+/*   By: mariade- <mariade-student.42lisboa.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/28 22:12:19 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/18 17:16:16 by mariade-         ###   ########.fr       */
+/*   Updated: 2026/06/29 17:47:56 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@
 
 # include <stdlib.h>
 # include <unistd.h>
-
 
 char	*get_next_line(int fd);
 size_t	gnl_strlen(char *line);
