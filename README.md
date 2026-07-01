@@ -30,56 +30,61 @@ If `-D BUFFER_SIZE` is omitted, the project still compiles, falling back to a de
 
 ```c
 #include "get_next_line.h"
+#include <fcntl.h>
+#include <stdio.h>
 
-int fd = open("file.txt", O_RDONLY);
-char *line;
-
-while ((line = get_next_line(fd)) != NULL)
+int	main(void)
 {
-    printf("%s", line);
-    free(line);
+	int fd = open("file.txt", O_RDONLY);
+	char *line;
+
+	while ((line = get_next_line(fd)) != NULL)
+	{
+		printf("[BUFFER]%s", line);
+		free(line);
+	}
+	close(fd);
 }
-close(fd);
 ```
 
 `get_next_line` must be called repeatedly (typically in a loop) until it returns `NULL`, which signals either end-of-file or an error. Each non-`NULL` call returns a newly heap-allocated line that the caller is responsible for freeing.
 
 ## Algorithm
 
-The function relies on a single `static char *stash` that persists across calls and holds whatever has been read from the file descriptor but not yet returned to the caller.
-
+The function relies on a single `static char buffer[BUFFER_SIZE + 1]`, declared inside `get_next_line` itself, that persists across calls. Unlike a design with a separate "stash", this buffer does double duty: it's both the target that `read()` writes fresh bytes into, and the storage that holds whatever was read but not yet handed back to the caller, since it keeps its contents between one call and the next.
+ 
 Each call to `get_next_line` follows these steps:
+ 
+1. **Validate input.** If `fd` is negative or `BUFFER_SIZE` is invalid, return `NULL` immediately.
 
-1. **Validate input.** If `fd` is negative or `BUFFER_SIZE` is invalid, return `NULL` immediately. (As an internal convenience, calling `get_next_line(-1)` is also used to force-free the static stash and reset it, which is useful for cleanly terminating use of the function — for example in single-call test programs — without altering its normal looped behavior.)
+2. **Refill the buffer only when it's empty.** At the start of each loop iteration, if `buffer` is currently empty (`!*buffer`), a `read()` of up to `BUFFER_SIZE` bytes is performed directly into it, and the result is null-terminated at `bytes_read`. If `buffer` already holds leftover data from a previous call, this step is skipped — nothing is read until that leftover is used up. This is what keeps the function from reading more than it needs to: with a tiny `BUFFER_SIZE` it just takes more `read()` calls; with a huge one, a single `read()` can capture several lines at once, and they get consumed one at a time across subsequent calls without any extra reading.
 
-2. **Read until a newline is found or EOF is reached.** As long as the stash does not already contain a `\n`, read another `BUFFER_SIZE` chunk from the file descriptor into a local buffer, and append it to the stash using `gnl_strjoin`. This loop only reads exactly as much as it needs to find at least one complete line — it never reads the whole file up front. This matters because `BUFFER_SIZE` can be arbitrarily small (e.g. `1`) or arbitrarily large (e.g. `9999999`), and the algorithm must behave correctly and efficiently in both cases: with a tiny buffer it simply takes more `read()` calls; with a huge buffer it may capture multiple lines in a single `read()`, which the stash mechanism handles transparently across calls.
+3. **Handle read errors or EOF.** If `read()` returns `-1`, the line built up so far is freed and `NULL` is returned. If `read()` returns `0` (EOF), whatever has been assembled in `line` so far is returned as-is (a partial final line, or `NULL` if nothing was left to read).
 
-3. **Handle read errors or empty stash.** If `read()` returns `-1`, or the stash ends up empty/`NULL`, the stash is freed and `NULL` is returned — this is the project's signal for "nothing left to read."
+4. **Append up to the next newline.** `gnl_strjoin(line, buffer)` allocates a new string, copies the existing `line` into it, then appends `buffer` — but only up to and including the first `\n` it finds (or the whole buffer, if no `\n` is present yet), since the amount to copy is measured by `gnl_strlen`, which stops at the first `\n` (inclusive) or at the terminating `\0`. The old `line` is freed inside `gnl_strjoin`, and the new, longer string becomes the current `line`.
 
-4. **Extract one line.** `extract_line` scans the stash for the first `\n` (or the end of the string, if EOF was reached without a trailing newline) and copies that portion — including the `\n` if present — into a new heap-allocated string. This is the line returned to the caller.
+5. **Shift the buffer.** `update_buffer` removes the portion that was just appended to `line` (using that same `gnl_strlen` measurement) and moves whatever bytes remain after it to the front of `buffer`, null-terminating the result. If nothing was consumed, the whole buffer is emptied. This is what lets any leftover data survive into the next call.
 
-5. **Update the stash.** `update_stash` shifts the stash forward past the line that was just extracted, keeping only what comes after the newline. If nothing remains, the stash is freed and reset to `NULL`. This is what lets the function "remember its place" the next time it's called on the same file descriptor.
+6. **Check for completion.** `find_new_line(line, '\n')` checks whether `line` now contains a `\n`. If it does, the loop breaks and the line is complete. If not, the loop repeats — either consuming leftover data still sitting in `buffer`, or triggering a fresh `read()` once `buffer` is empty again.
+This approach satisfies the constraint of reading as little as possible from the file descriptor on each call, while still correctly assembling lines that may span multiple `read()` calls or, conversely, multiple lines that arrive within a single `read()`. Folding the stash and the read buffer into one `static` array is what lets the function "remember its place" between otherwise independent calls without resorting to a global variable, which would go against the Norm/subject.
 
-This approach was chosen because it satisfies the constraint of reading as little as possible from the file descriptor on each call, while still correctly assembling lines that may span multiple `read()` calls or, conversely, multiple lines that arrive within a single `read()`. The `static` stash is the only mechanism available in C to preserve that state between otherwise independent function calls without relying on a global variable, which goes against the Norm/subject.
 
 ### Helper functions
 
 | Function | Purpose |
 |---|---|
-| `gnl_strlen` | Computes the length of a string, returns `0` on `NULL` |
-| `find_new_line` | Searches a string for a given character, used to check whether the stash already contains a full line |
-| `gnl_strjoin` | Concatenates the stash with a newly read buffer into a new heap allocation, freeing the old stash |
-| `extract_line` | Copies the first line (up to and including `\n`, or up to the end of the string) out of the stash |
-| `update_stash` | Returns a new stash containing everything after the extracted line, or `NULL` if nothing remains |
+| `gnl_strlen` | Computes the length of the line (string) including 1 extra for the '\n'|
+| `find_new_line` | Searches the line (string) for a given character ('\n'), used to check whether the buffer already contains a full line and also returns it counting with the '\n'|
+| `gnl_strjoin` | Concatenates the line and buffer into a new heap allocated string, freeing the old line |
+| `ft_memcpy` | has the same behavior as the Libft version and is used to save lines and clean up my code in the `gnl_strjoin` function |
+| `update_buffer` | Updates the buffer so it contains everything after the joined line and NULL terminates it|
 
 ## Resources
 
 - 42 peer to peer communication
 - `man read` — manual page for the `read()` system call
-- C documentation on the `static` storage class qualifier (videos, GeeksforGeeks, etc..)
+- C documentation on the `static` variable (videos, GeeksforGeeks, etc..)
 
 ### AI usage disclosure
 
-- AI was used to help write this README and to debug and understand why there was a valgrind 'leak' when the function is called once instead of in a loop (like the subject specifies).
-
-- It was also used to understand the difference between heap memory that is genuinely leaked versus heap memory that is still reachable through a valid pointer (the `static` stash) at program exit.
+- AI was used to help write this README and to debug different previous versions.

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mariade- <mariade-student.42lisboa.com>    +#+  +:+       +#+        */
+/*   By: mariade- <mariade-@student.42lisboa.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/05/28 22:12:27 by mariade-          #+#    #+#             */
-/*   Updated: 2026/06/30 04:59:49 by mariade-         ###   ########.fr       */
+/*   Updated: 2026/07/01 03:52:26 by mariade-         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,9 @@ size_t	gnl_strlen(char *line)
 	if (!line)
 		return (0);
 	i = 0;
-	while (line[i])
+	while (line[i] && line[i] != '\n')
+		i++;
+	if (line[i] == '\n')
 		i++;
 	return (i);
 }
@@ -31,7 +33,7 @@ char	*find_new_line(char *line, int c)
 	while (*line)
 	{
 		if (*line == (unsigned char)c)
-			return (line);
+			return (line + 1);
 		line++;
 	}
 	return (NULL);
@@ -40,78 +42,55 @@ char	*find_new_line(char *line, int c)
 char	*gnl_strjoin(char *line, char *buffer)
 {
 	char		*str;
-	size_t		i;
-	size_t		j;
+	size_t		len_line;
+	size_t		len_buffer;
 
 	if (!buffer)
-		return (NULL);
-	str = malloc ((gnl_strlen(line) + gnl_strlen(buffer) + 1) * sizeof(char));
+		return (line);
+	len_line = gnl_strlen(line);
+	len_buffer = gnl_strlen(buffer);
+	str = malloc(sizeof(char) * (len_line + len_buffer + 1));
 	if (!str)
-		return (NULL);
-	i = 0;
-	j = 0;
-	if (line)
-		while (line[i])
-			str[j++] = line[i++];
-	i = 0;
-	while (buffer[i])
-		str[j++] = buffer[i++];
-	str[j] = '\0';
+		return (free(str), NULL);
+	ft_memcpy(str, line, len_line);
 	free(line);
+	ft_memcpy(str + len_line, buffer, len_buffer);
+	str[len_line + len_buffer] = '\0';
 	return (str);
 }
 
-char	*extract_line(char *line)
+void	*ft_memcpy(void *dest, void *src, size_t n)
 {
-	char	*str;
-	size_t	i;
-	size_t	end;
+	unsigned char	*dest_ptr;
+	unsigned char	*src_ptr;
+	size_t			i;
 
-	if (!line)
-		return (free(line), NULL);
-	end = 0;
-	while (line[end] && line[end] != '\n')
-		end++;
-	if (line[end] == '\n')
-		end++;
-	str = malloc (end + 1);
-	if (!str)
-		return (NULL);
+	dest_ptr = dest;
+	src_ptr = src;
 	i = 0;
-	while (i < end)
+	while (i < n)
 	{
-		str[i] = line[i];
+		dest_ptr[i] = src_ptr[i];
 		i++;
 	}
-	str[i] = '\0';
-	return (str);
+	return (dest);
 }
 
-char	*update_stash(char *line, size_t start, size_t len)
+void	update_buffer(char *buffer)
 {
-	char	*new_stash;
-	size_t	i;
+	char	*new_buffer;
+	size_t	start;
+	int		i;
 
-	if (!line)
-		return (free(line), NULL);
-	while (line[start] && line[start] != '\n')
-		start++;
-	if (!line[start])
-		return (free(line), NULL);
-	start++;
-	len = gnl_strlen(line + start);
-	if (len == 0)
-		return (free(line), NULL);
-	new_stash = malloc(len + 1);
-	if (!new_stash)
-		return (free(line), NULL);
+	start = gnl_strlen(buffer);
+	new_buffer = buffer + start;
 	i = 0;
-	while (i < len)
+	if (!start)
+		return ;
+	while (new_buffer[i])
 	{
-		new_stash[i] = line[start + i];
+		buffer[i] = new_buffer[i];
 		i++;
 	}
-	new_stash[i] = '\0';
-	free(line);
-	return (new_stash);
+	buffer[i] = '\0';
 }
